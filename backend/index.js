@@ -32,9 +32,6 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 
-// Serve Swagger UI
-app.use('/', swaggerUi.serve, swaggerUi.setup(specs));
-
 //routes
 app.use("/auth", authRoutes);
 app.use("/books", booksRoutes);
@@ -42,6 +39,10 @@ app.use("/books", booksRoutes);
 
 // error handling
 app.use(errorHandler);
+
+// Serve Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 
 
 const PORT = process.env.PORT || 4134;
