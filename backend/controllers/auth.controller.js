@@ -4,6 +4,20 @@ const jwt = require("jsonwebtoken");
 const { createUser, getUserByEmail } = require('../services/user.service');
 const logger = require('../config/winston.logger');
 
+
+/**
+ * @swagger
+ * /auth/signup:
+ *   post:
+ *     summary: Sign Up a User
+ *     responses:
+ *       201:
+ *         description: Successful response
+ *         schema:
+ *           type: object
+ *           items:
+ *             $ref: '#/definitions/User'
+ */
 const signupController = asyncHandler(async (req, res, next) => {
     const body = req.body;
     if (!body.email || !body.password) {
@@ -49,7 +63,7 @@ const loginController = asyncHandler(async (req, res, next) => {
     const userObject = desiredUser.toObject();
     delete userObject.password;
 
-    const token = jwt.sign({user: userObject}, process.env.JWT_SECRET);
+    const token = jwt.sign({ user: userObject }, process.env.JWT_SECRET);
 
     const dataToSend = {
         token,

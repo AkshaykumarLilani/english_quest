@@ -2,6 +2,8 @@ require("dotenv").config();
 require("./config/sanitizeEnv");
 
 const express = require('express');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 const logger = require("./config/winston.logger");
 const cors = require('cors');
 const { mongodbConnection } = require("./config/dbConfig");
@@ -17,6 +19,22 @@ app.use(cors({
     origin: "*"
 }));
 
+// Swagger options
+const options = {
+    swaggerDefinition: {
+        info: {
+            title: 'Library API',
+            version: '1.0.0',
+        },
+    },
+    apis: ['./routes/*.js', './controllers/*.js'], // Specify the path to your route files or use inline annotations
+};
+
+const specs = swaggerJsdoc(options);
+
+// Serve Swagger UI
+app.use('/', swaggerUi.serve, swaggerUi.setup(specs));
+
 //routes
 app.use("/auth", authRoutes);
 app.use("/books", booksRoutes);
@@ -27,7 +45,7 @@ app.use(errorHandler);
 
 
 const PORT = process.env.PORT || 4134;
-app.listen(PORT, async ()=>{
+app.listen(PORT, async () => {
     try {
         console.log("Server is live at PORT:", PORT);
         console.log("Connecting to MongoDB ... ")
