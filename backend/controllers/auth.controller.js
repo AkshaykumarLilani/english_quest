@@ -7,6 +7,7 @@ const logger = require('../config/winston.logger');
 const signupController = asyncHandler(async (req, res, next) => {
     const body = req.body;
     if (!body.email || !body.password) {
+        res.status(400);
         throw new Error("Email and password, both are required");
     }
 
@@ -26,6 +27,7 @@ const signupController = asyncHandler(async (req, res, next) => {
 const loginController = asyncHandler(async (req, res, next) => {
     const body = req.body;
     if (!body.email || !body.password) {
+        res.status(400);
         throw new Error("Email and password, both are required");
     }
     logger.info(body);
@@ -33,12 +35,14 @@ const loginController = asyncHandler(async (req, res, next) => {
     const desiredUser = await getUserByEmail(body.email);
 
     if (!desiredUser) {
+        res.status(400);
         throw new Error("This email is not registered, please sign up first.");
     }
 
     const passwordMatches = bcryptjs.compareSync(body.password, desiredUser.password);
 
     if (!passwordMatches) {
+        res.status(400);
         throw new Error("Incorrect email or password");
     }
 
