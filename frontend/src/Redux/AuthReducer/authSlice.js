@@ -11,10 +11,14 @@ const initialState = {
     errorMessage: null,
 }
 
-export const loginUserAsync = createAsyncThunk("auth/login", async ({ email, password }) => {
-    const response = await axios.post("/auth/login/", { email, password });
-    return response.data
-});
+export const loginUserAsync = createAsyncThunk("auth/login", async ({ email, password }, thunkAPI) => {
+    try {
+        const response = await axios.post("/auth/login/", { email, password });
+        return response.data;
+    } catch (err) {
+            return thunkAPI.rejectWithValue(err.response.data);
+        }
+    });
 
 export const signupUserAsync = createAsyncThunk("auth/signup", async ({ email, password, role }, thunkAPI) => {
     try {
@@ -39,6 +43,10 @@ const authSlices = createSlice({
         resetSignUpStatus(state) {
             state.signupStatus = null;
             state.errorMessage = null;
+        },
+        resetLoginStatus(state) {
+            state.status = null;
+            state.errorMessage = null;
         }
     },
     extraReducers: builder => {
@@ -53,11 +61,14 @@ const authSlices = createSlice({
             state.token = data.token;
             state.user = data.user;
         });
-        builder.addCase(loginUserAsync.rejected, (state) => {
+        builder.addCase(loginUserAsync.rejected, (state, action) => {
             state.status = asyncStatuses.FAILED;
             state.isAuthenticated = null;
             state.token = null;
             state.user = {};
+            if (action?.payload?.message) {
+                state.errorMessage = action.payload.message;
+            }
         });
 
         builder.addCase(signupUserAsync.pending, (state) => {
@@ -75,5 +86,5 @@ const authSlices = createSlice({
     }
 });
 
-export const { logoutUser, resetSignUpStatus } = authSlices.actions;
+export const { logoutUser, resetSignUpStatus, resetLoginStatus } = authSlices.actions;
 export default authSlices.reducer;

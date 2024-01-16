@@ -43,7 +43,7 @@ const SignUpPage = () => {
             openNotification("Sign up successful, please login", null, "success");
             thisForm.resetFields();
             dispatch(resetSignUpStatus());
-            navigate("/");
+            setTimeout(()=>navigate("/"), 500);
         } else if (signUpRequestStatus === asyncStatuses.FAILED) {
             openNotification("Sign up failed", signUpRequestErrorMessage, "error");
             dispatch(resetSignUpStatus());
