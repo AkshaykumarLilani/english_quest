@@ -1,0 +1,32 @@
+.container {
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+}
+
+.leftImageSection {
+  flex: 1;
+  height: 100%;
+  background: url("../../../Assets/Login/library.mp4");
+  background-position: center;
+  background-size: cover;
+  position: relative;
+}
+
+.leftImageSection::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 46%);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.rightFormSection {
+  flex: 1;
+}
+
+.rightLoginFormContainer {
+  min-width: 55%;
+}
