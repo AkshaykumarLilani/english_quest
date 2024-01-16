@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { createBook, getPaginatedBooksList, getOwnBooks, getNonPaginatedBooks } = require("../services/book.service");
+const { createBook, getPaginatedBooksList, getOwnBooks, getNonPaginatedBooks, getBookCountWithFilter, getBookById, deleteBookById } = require("../services/book.service");
 const { USER_ROLES } = require("../config/enums");
 const logger = require("../config/winston.logger");
 
@@ -44,27 +44,50 @@ const getAllBooks = asyncHandler(async (req, res) => {
 
     if (hasViewAllPermission) {
         let books = {};
+        let count = 0;
         if (Number(new_) === 1) {
             // show books that are created in the last 10 minutes
             const filter = { createdAt: { $gte: tenMinutesAgo, $lt: new Date() } };
             books = await getNonPaginatedBooks(filter);
+            count = await getBookCountWithFilter(filter);
         } else if (Number(old_) === 1) {
             // show books that were created 10 or more minutes ago
             const filter = { createdAt: { $lt: tenMinutesAgo } };
             books = await getNonPaginatedBooks(filter);
+            count = await getBookCountWithFilter(filter);
         } else {
             books = await getPaginatedBooksList(pageNo, pageSize);
+            count = await getBookCountWithFilter();
         }
-        return res.status(200).json(books);
+        return res.status(200).json({ results: books, count: count });
     } else if (hasViewerPermission) {
         const books = await getOwnBooks(req.user._id, pageNo, pageSize);
-        return res.status(200).json(books);
+        const filter = { creator: req.user._id }
+        const count = await getBookCountWithFilter(filter);
+        return res.status(200).json({ results: books, count: count });
     } else {
         // this should never happen since canView middleware checks this condition
     }
 });
 
+const deleteABook = asyncHandler(async (req, res) => {
+    const body = req.body;
+
+    const potentialBook = await getBookById(body.id);
+
+    if (!potentialBook){
+        res.status(400);
+        throw new Error("This id is invalid");
+    }
+
+    const deleteBook = await deleteBookById(body.id);
+    logger.info({deleteBook})
+
+    return res.status(204).json();
+});
+
 module.exports = {
     saveABook,
-    getAllBooks
+    getAllBooks,
+    deleteABook
 }

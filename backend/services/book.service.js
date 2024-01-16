@@ -20,9 +20,24 @@ const getNonPaginatedBooks = (filter) => {
     return Book.find(filter).sort({ createdAt: -1 });
 }
 
+const getBookCountWithFilter = (filter = {}) => {
+    return Book.find(filter).count()
+}
+
+const getBookById = (id) => {
+    return Book.findOne({ _id: id });
+}
+
+const deleteBookById = (id) => {
+    return Book.findOneAndDelete({ _id: id });
+}
+
 module.exports = {
     createBook,
     getPaginatedBooksList,
     getOwnBooks,
-    getNonPaginatedBooks
+    getNonPaginatedBooks,
+    getBookCountWithFilter,
+    getBookById,
+    deleteBookById
 }
