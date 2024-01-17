@@ -43,7 +43,7 @@ const SignUpPage = () => {
             openNotification("Sign up successful, please login", null, "success");
             thisForm.resetFields();
             dispatch(resetSignUpStatus());
-            setTimeout(()=>navigate("/"), 500);
+            setTimeout(() => navigate("/"), 500);
         } else if (signUpRequestStatus === asyncStatuses.FAILED) {
             openNotification("Sign up failed", signUpRequestErrorMessage, "error");
             dispatch(resetSignUpStatus());
@@ -51,7 +51,7 @@ const SignUpPage = () => {
             // loading or null
             // do nothing
         }
-    }, [signUpRequestStatus, dispatch, notificationApi, signUpRequestErrorMessage]);
+    }, [signUpRequestStatus, dispatch, notificationApi, signUpRequestErrorMessage, navigate, thisForm]);
 
     const onFinish = useCallback((values) => {
         delete values.confirm_password;
@@ -90,11 +90,15 @@ const SignUpPage = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please input your email!',
+                                        message: 'Please input email!',
+                                    },
+                                    {
+                                        type: 'email',
+                                        message: 'Invalid email format!',
                                     },
                                 ]}
                             >
-                                <Input />
+                                <Input placeholder="Please enter email" />
                             </Form.Item>
 
                             <Form.Item

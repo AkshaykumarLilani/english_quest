@@ -81,11 +81,15 @@ const LoginPage = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please input your email!',
+                                        message: 'Please input email!',
+                                    },
+                                    {
+                                        type: 'email',
+                                        message: 'Invalid email format!',
                                     },
                                 ]}
                             >
-                                <Input />
+                                <Input placeholder="Please enter email" />
                             </Form.Item>
 
                             <Form.Item
