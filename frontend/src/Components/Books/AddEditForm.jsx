@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { Button, Form, Input, notification } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { addARecord, fetchARecord } from '../../Redux/BooksReducer/bookSlices';
+import { addARecord, editARecord, fetchARecord } from '../../Redux/BooksReducer/bookSlices';
 // import apiUrls from 'Utils/apiUrls';
 import { FormModesEnum, asyncStatuses } from '../../Redux/enums';
 import { LoadingOutlined } from "@ant-design/icons"
@@ -25,13 +25,17 @@ const AddEditForm = ({ apiUrl = "/books" }) => {
     const fetchRecordStatus = useSelector(store => store.books?.fetchRecordStatus);
     const addRecordStatus = useSelector(store => store.books?.addRecordStatus);
     const currentRecordData = useSelector(store => store.books?.currentRecordData);
+    const editRecordStatus = useSelector(store => store.books?.editRecordStatus);
+
 
     useEffect(() => {
-        if (addRecordStatus === asyncStatuses.SUCCESS) {
+        if (editRecordStatus === asyncStatuses.SUCCESS) {
+            form.resetFields();
+        } else if (addRecordStatus === asyncStatuses.SUCCESS) {
             form.resetFields();
         }
         return form.resetFields();
-    }, [addRecordStatus, form]);
+    }, [editRecordStatus, addRecordStatus, form]);
 
     useEffect(() => {
         // console.log({ fetchARecord, currentRecordData });
@@ -53,6 +57,11 @@ const AddEditForm = ({ apiUrl = "/books" }) => {
     const addNew = (val) => {
         // console.log(val);
         dispatch(addARecord({ apiUrl: apiUrl, data: val }));
+    }
+
+    const edit = (val) => {
+        console.log(val);
+        dispatch(editARecord({ apiUrl, id: currentEditViewFormId, data: val }));
     }
 
     const validatePublishedYear = (rule, value) => {
@@ -77,10 +86,10 @@ const AddEditForm = ({ apiUrl = "/books" }) => {
     };
 
     const onFinish = (val) => {
-        delete val.confirm_password;
-        val.username = val.email;
         if (currentFormMode === FormModesEnum.ADD) {
             addNew(val);
+        } else if (currentFormMode === FormModesEnum.EDIT) {
+            edit(val);
         } else {
             // console.log("No suitable mode found");
         }
@@ -141,7 +150,18 @@ const AddEditForm = ({ apiUrl = "/books" }) => {
                                     Submit
                                 </Button>
                         }
-                    </Form.Item>  : <></>
+                    </Form.Item> : currentFormMode === FormModesEnum.EDIT ? <Form.Item>
+                        {
+                            editRecordStatus === asyncStatuses.LOADING ?
+                                <Button type="primary" htmlType="submit" disabled>
+                                    <LoadingOutlined />
+                                    Updating
+                                </Button> :
+                                <Button type="primary" htmlType="submit" >
+                                    Update
+                                </Button>
+                        }
+                    </Form.Item> : <></>
                 }
 
             </Form >

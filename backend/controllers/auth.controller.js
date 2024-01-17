@@ -4,19 +4,45 @@ const jwt = require("jsonwebtoken");
 const { createUser, getUserByEmail } = require('../services/user.service');
 const logger = require('../config/winston.logger');
 
-
 /**
  * @swagger
- * /auth/signup:
+ * /signup:
  *   post:
- *     summary: Sign Up a User
+ *     summary: Register a new user
+ *     description: Creates a new user account with the provided email and password.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       description: User information for registration
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
  *     responses:
- *       201:
- *         description: Successful response
- *         schema:
- *           type: object
- *           items:
- *             $ref: '#/definitions/User'
+ *       '201':
+ *         description: Successfully registered a new user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: The user ID
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                   description: The registered email
+ *       '400':
+ *         description: Bad request. Email and password are required, or the email is already registered.
  */
 const signupController = asyncHandler(async (req, res, next) => {
     const body = req.body;
@@ -38,6 +64,53 @@ const signupController = asyncHandler(async (req, res, next) => {
     return res.status(201).json(userToSend);
 })
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Log in to the application
+ *     description: Logs in a user with the provided email and password, returning an authentication token.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       description: User credentials for login
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       '200':
+ *         description: Successfully logged in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Authentication token for the logged-in user
+ *                 user:
+ *                   type: object
+ *                   description: User information (excluding password)
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       description: The user ID
+ *                     email:
+ *                       type: string
+ *                       format: email
+ *                       description: The user's email
+ *       '400':
+ *         description: Bad request. Email and password are required, or the email is not registered, or the password is incorrect.
+ */
 const loginController = asyncHandler(async (req, res, next) => {
     const body = req.body;
     if (!body.email || !body.password) {

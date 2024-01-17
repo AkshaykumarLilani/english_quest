@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Title from 'antd/es/typography/Title';
 import { useSearchParams } from 'react-router-dom';
 import { EditOutlined, DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { fetchAllRecords, resetAddRecordStatus, resetDeleteRecordStatus, resetFetchRequestStatus, resetFormModeToNone, setFormModeAsAdd, setFormModeAsEdit, setFormModeAsView, deleteARecord } from '../Redux/BooksReducer/bookSlices';
+import { fetchAllRecords, resetAddRecordStatus, resetDeleteRecordStatus, resetFetchRequestStatus, resetFormModeToNone, setFormModeAsAdd, setFormModeAsEdit, setFormModeAsView, deleteARecord, resetEditRecordStatus } from '../Redux/BooksReducer/bookSlices';
 import AddEditForm from '../Components/Books/AddEditForm';
 import CustomPagination from '../Components/Books/CustomPagination';
 import { FormModesEnum, asyncStatuses } from '../Redux/enums';
@@ -123,7 +123,7 @@ const BooksPage = () => {
                             onConfirm={() => {
                                 dispatch(deleteARecord({ apiUrl: apiUrl, id: row?._id }));
                             }}
-                            onCancel={(e) => {
+                            onCancel={() => {
                                 //console.log(e)
                             }}
                             icon={
@@ -157,6 +157,7 @@ const BooksPage = () => {
     const fetchRequestErrorMessage = useSelector(store => store.books.fetchRequestErrorMessage);
     const deleteRecordStatus = useSelector(store => store.books.deleteRecordStatus);
     const addRecordStatus = useSelector(store => store.books.addRecordStatus);
+    const editRecordStatus = useSelector(store => store.books.editRecordStatus);
 
     useEffect(() => {
         let currentPageNumber = searchParams.get(searchParamsEnum.PAGE) || 1;
@@ -230,7 +231,20 @@ const BooksPage = () => {
                 openNotification(`Error while adding the Book.`, null, "error");
             }, 300);
         }
-    }, [fetchRequestStatus, deleteRecordStatus, dispatch, addRecordStatus, searchParams, openNotification, resetFormMode, fetchRequestErrorMessage]);
+        if (editRecordStatus && editRecordStatus === asyncStatuses.SUCCESS) {
+            dispatch(resetEditRecordStatus());
+            resetFormMode();
+            dispatch(fetchAllRecords({ apiUrl, searchParams }));
+            openNotification("Updated", null, "success");
+            setTimeout(() => dispatch(resetEditRecordStatus()), 300);
+        }
+        if (editRecordStatus && editRecordStatus === asyncStatuses.FAILED) {
+            setTimeout(() => {
+                dispatch(resetEditRecordStatus());
+                openNotification(`Error while editing the Book`, null, "error");
+            }, 300);
+        }
+    }, [fetchRequestStatus, editRecordStatus, deleteRecordStatus, dispatch, addRecordStatus, searchParams, openNotification, resetFormMode, fetchRequestErrorMessage]);
 
     return (<>
         {contextHolder}
@@ -253,10 +267,10 @@ const BooksPage = () => {
                 }
             </Flex>
             <Table
-                onRow={(record, rowIndex) => {
+                onRow={(record) => {
                     return {
                         onClick: (event) => {
-                            // console.log({ record, rowIndex, event });
+                            // console.log({ record, event });
                             if (event.target.localName === "td") {
                                 dispatch(setFormModeAsView({ id: record._id || record.uuid }));
                             }

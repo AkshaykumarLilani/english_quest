@@ -26,7 +26,7 @@ export const fetchARecord = createAsyncThunk("fetch", async ({ apiUrl, id }) => 
 
 export const deleteARecord = createAsyncThunk("delete", async ({ apiUrl, id }) => {
     // console.log({ apiUrl, id });
-    const response = await axios.post(`${apiUrl}/delete/`, { id });
+    const response = await axios.delete(`${apiUrl}/delete/?id=${id}`);
     const data = response.data;
     return data;
 });
@@ -34,6 +34,13 @@ export const deleteARecord = createAsyncThunk("delete", async ({ apiUrl, id }) =
 export const addARecord = createAsyncThunk("add", async ({ apiUrl, data }) => {
     // console.log({ apiUrl, data });
     const response = await axios.post(apiUrl + "/", data);
+    const responseData = response.data;
+    return responseData;
+});
+
+export const editARecord = createAsyncThunk("edit", async ({ apiUrl, id, data }) => {
+    console.log({ apiUrl, id, data });
+    const response = await axios.patch(apiUrl + `/${id}/`, data);
     const responseData = response.data;
     return responseData;
 });
@@ -48,7 +55,8 @@ const initialState = {
     fetchRecordStatus: null,
     currentEditViewFormId: null,
     currentFormMode: FormModesEnum.NONE,
-    currentRecordData: {}
+    currentRecordData: {},
+    editRecordStatus: null,
 }
 
 const masterSlice = createSlice({
@@ -64,6 +72,12 @@ const masterSlice = createSlice({
         },
         resetAddRecordStatus(state) {
             state.addRecordStatus = null;
+        },
+        resetEditRecordStatus(state) {
+            state.editRecordStatus = null;
+        },
+        resetFetchRecordStatus(state) {
+            state.fetchRecordStatus = null;
         },
         setFormModeAsEdit(state, action) {
             state.currentEditViewFormId = action.payload.id;
@@ -145,6 +159,17 @@ const masterSlice = createSlice({
         builder.addCase(fetchARecord.rejected, (state) => {
             state.fetchRecordStatus = asyncStatuses.FAILED;
             state.currentRecordData = {};
+        });
+
+        // edit a record
+        builder.addCase(editARecord.pending, (state) => {
+            state.editRecordStatus = asyncStatuses.LOADING;
+        });
+        builder.addCase(editARecord.fulfilled, (state) => {
+            state.editRecordStatus = asyncStatuses.SUCCESS;
+        });
+        builder.addCase(editARecord.rejected, (state) => {
+            state.editRecordStatus = asyncStatuses.FAILED;
         });
     }
 });
