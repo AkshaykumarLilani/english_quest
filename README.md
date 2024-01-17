@@ -4,6 +4,6 @@
 
 ### Deployment Links
 
-Backend: [https://english-quest-backend.onrender.com/](https://english-quest-backend.onrender.com/ "Backend")
+API Docs: [https://english-quest-backend.onrender.com/api-docs](https://english-quest-backend.onrender.com/api-docs "API Docs")
 
 Frontend: [https://singular-panda-c399c9.netlify.app/](https://singular-panda-c399c9.netlify.app/ "Frontend")
