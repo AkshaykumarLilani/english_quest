@@ -50,4 +50,4 @@ To run the project locally, follow these steps:
 
 ## Contributors
 
-- [Akshaykumar Lilani]([link-to-your-github-profile](https://github.com/AkshaykumarLilani)): Project Lead
+- [Akshaykumar Lilani](https://github.com/AkshaykumarLilani): Project Lead
