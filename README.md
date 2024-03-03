@@ -48,12 +48,6 @@ To run the project locally, follow these steps:
 7. Start the server: `npm start`.
 8. Access the web interface at `http://localhost:3000`.
 
-## Submission Guidelines
-
-1. Fork the repository.
-2. Make changes and commit to your forked repository.
-3. Submit a pull request with your changes.
-
 ## Contributors
 
 - [Akshaykumar Lilani]([link-to-your-github-profile](https://github.com/AkshaykumarLilani)): Project Lead
